@@ -1,0 +1,124 @@
+
+import random
+
+class BankAccount:
+    def __init__(self, name, email, phone, aadhar):
+        self.name = name
+        self.email = email
+        self.phone = phone
+        self.aadhar = aadhar
+        self.account = {"name": name, "email": email, "phone": phone, "aadhar": aadhar}
+        self.account['acc_no'] = random.randint(1000000000, 9999999999)
+        self.account['balance'] = 0
+        self.account['pin'] = random.randint(100000, 999999)
+
+    def account_validation(self, accounts):
+        for acc in accounts:
+            if acc["aadhar"] == self.aadhar:
+                print("An account already exists for this user! Please try to log in.")
+                return False
+        return True
+
+class Bank:
+    def __init__(self):
+        self.accounts = []
+
+    def create_account(self, name, email, phone, aadhar):
+        new_account = BankAccount(name, email, phone, aadhar)
+        if new_account.account_validation(self.accounts):
+            self.accounts.append(new_account.account)
+            print("Account created successfully.")
+            print(f"Account Number: {new_account.account['acc_no']}")
+            print(f"PIN: {new_account.account['pin']}")
+
+    def login(self, acc_no, pin):
+        for account in self.accounts:
+            if str(account["acc_no"]) == acc_no and str(account["pin"]) == pin:
+                return account
+        return None
+
+    def change_pin(self, account, new_pin):
+        account['pin'] = new_pin
+        print("PIN changed successfully.")
+
+    def deposit(self, account, amount):
+        account['balance'] += amount
+        print("Deposited successfully.")
+
+    def withdraw(self, account, amount):
+        if account['balance'] >= amount:
+            account['balance'] -= amount
+            print("Withdrawn successfully.")
+        else:
+            print("Insufficient balance.")
+
+    def check_balance(self, account):
+        print(f"Your current balance is {account['balance']}")
+
+    def delete_account(self, account):
+        self.accounts.remove(account)
+        print("Account deleted successfully.")
+
+if __name__ == "__main__":
+    bank = Bank()
+    while True:
+        print("1. Create Account")
+        print("2. Login")
+        print("3. Exit")
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            name = input("Enter your name: ")
+            email = input("Enter your email: ")
+            phone = input("Enter your phone number: ")
+            aadhar = input("Enter your Aadhar number: ")
+            bank.create_account(name, email, phone, aadhar)
+
+        elif choice == '2':
+            acc_no = input("Enter your Account Number: ")
+            pin = input("Enter your PIN: ")
+            logged_in_account = bank.login(acc_no, pin)
+            if logged_in_account:
+                print("Login Successful")
+                while True:
+                    print("1. Deposit")
+                    print("2. Withdraw")
+                    print("3. Change PIN")
+                    print("4. Check Balance")
+                    print("5. Delete Account")
+                    print("6. Logout")
+                    option = input("Enter your choice: ")
+
+                    if option == '1':
+                        amount = float(input("Enter the amount to deposit: "))
+                        bank.deposit(logged_in_account, amount)
+
+                    elif option == '2':
+                        amount = float(input("Enter the amount to withdraw: "))
+                        bank.withdraw(logged_in_account, amount)
+
+                    elif option == '3':
+                        new_pin = input("Enter your new PIN: ")
+                        bank.change_pin(logged_in_account, new_pin)
+
+                    elif option == '4':
+                        bank.check_balance(logged_in_account)
+
+                    elif option == '5':
+                        bank.delete_account(logged_in_account)
+                        break
+
+                    elif option == '6':
+                        break
+
+                    else:
+                        print("Invalid option.")
+
+            else:
+                print("Invalid Account Number or PIN. Please try again.")
+
+        elif choice == '3':
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
